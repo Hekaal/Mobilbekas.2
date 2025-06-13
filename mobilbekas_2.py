@@ -148,11 +148,11 @@ def load_filter_data(file_path="mobilbekas.csv"):
 df_filter_data = load_filter_data()
 
 # Tambahkan gambar (opsional)
-#try:
-#     image = Image.open('prediksi-harga-mobil.jpg') # Ganti dengan nama file gambar Anda
-#     st.image(image, use_container_width=True)
-#except FileNotFoundError:
-#     st.caption("Tambahkan 'prediksi-harga-mobil.jpg' di direktori yang sama untuk gambar header.")
+try:
+     image = Image.open('prediksi-harga-mobil.jpg') # Ganti dengan nama file gambar Anda
+     st.image(image, use_container_width=True)
+except FileNotFoundError:
+     st.caption("Tambahkan 'prediksi-harga-mobil.jpg' di direktori yang sama untuk gambar header.")
 
 # --- Tambahkan Gambar di Konten Utama ---
 # Ganti blok try-except ini dengan yang baru untuk SVG
@@ -201,9 +201,7 @@ except FileNotFoundError:
     st.caption(f"File SVG '{svg_file_name}' tidak ditemukan. Pastikan ada di direktori yang sama di repositori Anda.")
 except Exception as e:
     st.caption(f"Tidak dapat menampilkan gambar SVG: {e}")
-
-st.subheader("Input Detail Mobil")
-
+    
 # --- Konten Sidebar ---
 with st.sidebar:
     # Tambahkan gambar (opsional) di sidebar
