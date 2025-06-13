@@ -156,18 +156,54 @@ df_filter_data = load_filter_data()
 
 # --- Tambahkan Gambar di Konten Utama ---
 # Ganti blok try-except ini dengan yang baru untuk SVG
+# --- Tambahkan Gambar di Konten Utama ---
 try:
-    # Asumsikan nama file SVG Anda adalah 'my_car_illustration.svg'
-    # Ganti 'my_car_illustration.svg' dengan nama file SVG Anda yang sebenarnya
-    with open('Prediksi_Harga_Mobil.svg', 'r') as f:
+    # Nama file SVG Anda
+    svg_file_name = 'Prediksi_Harga_Mobil.svg' # Sesuaikan ini jika nama file Anda berbeda
+
+    with open(svg_file_name, 'r') as f:
         svg_content = f.read()
 
-    st.markdown(svg_content, unsafe_allow_html=True)
+    # --- Bagian Kunci: Menyesuaikan Ukuran SVG ---
+    # Kita akan mencari tag <svg> dan memastikan ada atribut width="100%" height="auto"
+    # Ini adalah pendekatan yang lebih umum dan aman
+    if '<svg' in svg_content:
+        # Menambahkan atau mengganti atribut width dan height
+        # Regex ini mencari tag <svg> dan menambahkan/mengganti width/height
+        # Ini mungkin perlu disesuaikan tergantung kompleksitas SVG Anda
+        svg_content_modified = re.sub(
+            r'<svg([^>]*?)width="[^"]*"([^>]*?)height="[^"]*"([^>]*?)',
+            r'<svg\1width="100%"\2height="auto"\3',
+            svg_content,
+            flags=re.IGNORECASE
+        )
+        # Jika belum ada atribut width/height sama sekali, tambahkan
+        if 'width="100%"' not in svg_content_modified:
+             svg_content_modified = svg_content_modified.replace('<svg', '<svg width="100%" height="auto"', 1)
+        
+        # Opsi lain jika SVG sudah memiliki viewBox dan Anda hanya ingin fluiditas
+        # svg_content_modified = re.sub(
+        #     r'<svg([^>]*?)',
+        #     r'<svg\1 style="width:100%; height:auto;"',
+        #     svg_content,
+        #     flags=re.IGNORECASE
+        # )
+
+    else:
+        # Jika bukan SVG valid, tampilkan pesan error
+        st.error(f"File '{svg_file_name}' sepertinya bukan file SVG yang valid.")
+        st.stop()
+
+
+    st.markdown(svg_content_modified, unsafe_allow_html=True)
+    st.caption("Ilustrasi Prediksi Harga Mobil Bekas") # Caption untuk gambar SVG
 
 except FileNotFoundError:
-    st.caption("File SVG tidak ditemukan. Pastikan 'Prediksi_Harga_Mobil.svg' ada di direktori yang sama di repositori Anda.")
+    st.caption(f"File SVG '{svg_file_name}' tidak ditemukan. Pastikan ada di direktori yang sama di repositori Anda.")
 except Exception as e:
     st.caption(f"Tidak dapat menampilkan gambar SVG: {e}")
+
+st.subheader("Input Detail Mobil")
 
 # --- Konten Sidebar ---
 with st.sidebar:
