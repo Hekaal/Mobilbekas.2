@@ -1,3 +1,6 @@
+# Ini harus menjadi baris PERTAMA di seluruh file Anda.
+# Tidak boleh ada kode lain (termasuk import) DI ATAS INI,
+# kecuali mungkin komentar atau docstring.
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,68 +9,10 @@ from catboost import CatBoostRegressor
 import re
 # from PIL import Image # Tetap import jika Anda ingin menambahkan gambar
 
-# --- Load Model ---
-@st.cache_resource
-def load_model():
-    try:
-        with open("catboost_model_quikr.pkl", "rb") as f:
-            model = pickle.load(f)
-        return model
-    except FileNotFoundError:
-        st.error("Error: 'catboost_model_quikr.pkl' not found. Pastikan file model ada di direktori yang sama.")
-        st.stop()
-    except Exception as e:
-        st.error(f"Terjadi kesalahan saat memuat model: {e}")
-        st.stop()
-
-model = load_model()
-
-# --- Load and Preprocess Data for Filtering ---
-@st.cache_data
-def load_filter_data(file_path="mobilbekas.csv"):
-    try:
-        df = pd.read_csv(file_path)
-
-        # Basic cleaning for relevant columns to ensure filtering works
-        if 'harga' in df.columns:
-            df['harga'] = pd.to_numeric(df['harga'], errors='coerce')
-        if 'tahun' in df.columns:
-            df['tahun'] = pd.to_numeric(df['tahun'], errors='coerce')
-        if 'jarak_tempuh' in df.columns:
-            def parse_kms(km_str):
-                if pd.isna(km_str): return np.nan
-                km_str = str(km_str).replace(".", "").replace(",", "").strip()
-                digits = re.findall(r'\d+', km_str)
-                if digits:
-                    if '-' in km_str:
-                        parts = [int(p) for p in digits]
-                        return (int(parts[0]) + int(parts[1])) / 2 if len(parts) >= 2 else int(digits[0])
-                    return int(digits[0])
-                return np.nan
-            df['jarak_tempuh'] = df['jarak_tempuh'].apply(parse_kms)
-
-        for col in ['merek', 'model', 'tipe_bahan_bakar', 'transmisi', 'warna', 'varian']:
-            if col in df.columns:
-                df[col] = df[col].astype(str).fillna('Unknown')
-            else:
-                df[col] = 'Unknown'
-
-        df.dropna(subset=['merek', 'model', 'tipe_bahan_bakar', 'transmisi'], inplace=True)
-        return df
-
-    except FileNotFoundError:
-        st.error(f"Error: '{file_path}' not found. File ini dibutuhkan untuk filtering dinamis. Pastikan ada di direktori yang sama.")
-        st.stop()
-    except Exception as e:
-        st.error(f"Terjadi kesalahan saat memuat atau memproses dataset untuk filtering: {e}")
-        st.stop()
-
-df_filter_data = load_filter_data()
-
 # --- Konfigurasi Halaman (HARUS DI BAGIAN PALING ATAS!) ---
 st.set_page_config(page_title="Prediksi Harga Mobil Bekas", layout="centered", page_icon="🚗")
 
-# Custom CSS untuk tampilan lebih menarik
+# Custom CSS untuk tampilan lebih menarik (ini juga bagian dari konfigurasi awal)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
@@ -142,6 +87,73 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- LANJUTKAN DENGAN SEMUA KODE LAINNYA DI BAWAH INI ---
+
+# --- Load Model ---
+@st.cache_resource
+def load_model():
+    try:
+        with open("catboost_model_quikr.pkl", "rb") as f:
+            model = pickle.load(f)
+        return model
+    except FileNotFoundError:
+        st.error("Error: 'catboost_model_quikr.pkl' not found. Pastikan file model ada di direktori yang sama.")
+        st.stop()
+    except Exception as e:
+        st.error(f"Terjadi kesalahan saat memuat model: {e}")
+        st.stop()
+
+model = load_model()
+
+# --- Load and Preprocess Data for Filtering ---
+@st.cache_data
+def load_filter_data(file_path="mobilbekas.csv"):
+    try:
+        df = pd.read_csv(file_path)
+
+        # Basic cleaning for relevant columns to ensure filtering works
+        if 'harga' in df.columns:
+            df['harga'] = pd.to_numeric(df['harga'], errors='coerce')
+        if 'tahun' in df.columns:
+            df['tahun'] = pd.to_numeric(df['tahun'], errors='coerce')
+        if 'jarak_tempuh' in df.columns:
+            def parse_kms(km_str):
+                if pd.isna(km_str): return np.nan
+                km_str = str(km_str).replace(".", "").replace(",", "").strip()
+                digits = re.findall(r'\d+', km_str)
+                if digits:
+                    if '-' in km_str:
+                        parts = [int(p) for p in digits]
+                        return (int(parts[0]) + int(parts[1])) / 2 if len(parts) >= 2 else int(digits[0])
+                    return int(digits[0])
+                return np.nan
+            df['jarak_tempuh'] = df['jarak_tempuh'].apply(parse_kms)
+
+        for col in ['merek', 'model', 'tipe_bahan_bakar', 'transmisi', 'warna', 'varian']:
+            if col in df.columns:
+                df[col] = df[col].astype(str).fillna('Unknown')
+            else:
+                df[col] = 'Unknown'
+
+        df.dropna(subset=['merek', 'model', 'tipe_bahan_bakar', 'transmisi'], inplace=True)
+        return df
+
+    except FileNotFoundError:
+        st.error(f"Error: '{file_path}' not found. File ini dibutuhkan untuk filtering dinamis. Pastikan ada di direktori yang sama.")
+        st.stop()
+    except Exception as e:
+        st.error(f"Terjadi kesalahan saat memuat atau memproses dataset untuk filtering: {e}")
+        st.stop()
+
+df_filter_data = load_filter_data()
+
+# Tambahkan gambar (opsional)
+# try:
+#     image = Image.open('car_banner.png') # Ganti dengan nama file gambar Anda
+#     st.image(image, use_column_width=True)
+# except FileNotFoundError:
+#     st.caption("Tambahkan 'car_banner.png' di direktori yang sama untuk gambar header.")
+
 # --- Konten Sidebar ---
 with st.sidebar:
     # Tambahkan gambar (opsional) di sidebar
@@ -150,7 +162,7 @@ with st.sidebar:
     #     st.image(image, use_column_width=True)
     # except FileNotFoundError:
     #     st.caption("Tambahkan 'car_logo.png' di direktori yang sama untuk gambar logo.")
-    
+
     st.subheader("📊 Performa Model")
     st.info(f"""
         **Akurasi Model Berdasarkan Data Uji:**
@@ -290,7 +302,7 @@ features_df = pd.DataFrame([{
     'company_model': company_model_feature,
     'tipe_bahan_bakar': fuel_type_input,
     'log_km': log_km_feature,
-    'age': negative_age_feature, # Menggunakan negative_age_feature jika model dilatih dengan ini
+    'negative_age': negative_age_feature, # Menggunakan negative_age_feature jika model dilatih dengan ini
     'segment': segment_feature,
     'fuel_age': fuel_age_feature,
     'company_segment': company_segment_feature,
