@@ -159,7 +159,7 @@ df_filter_data = load_filter_data()
 # --- Tambahkan Gambar di Konten Utama ---
 try:
     # Nama file SVG Anda
-    svg_file_name = 'Prediksi_Harga_Mobil.svg' # Sesuaikan ini jika nama file Anda berbeda
+    svg_file_name = 'header-web.svg' # Sesuaikan ini jika nama file Anda berbeda
 
     with open(svg_file_name, 'r') as f:
         svg_content = f.read()
