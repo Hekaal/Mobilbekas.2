@@ -160,7 +160,7 @@ with st.sidebar:
     # Tambahkan gambar (opsional) di sidebar
     try:
          image = Image.open('PASD.png') # Ganti dengan nama file gambar logo Anda
-         st.image(image, use_column_width=True)
+         st.image(image, use_container_width=True)
     except FileNotFoundError:
          st.caption("Tambahkan 'PASD.png' di direktori yang sama untuk gambar logo.")
     
