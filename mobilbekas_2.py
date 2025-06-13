@@ -158,11 +158,11 @@ except FileNotFoundError:
 # --- Konten Sidebar ---
 with st.sidebar:
     # Tambahkan gambar (opsional) di sidebar
-    # try:
-    #     image = Image.open('car_logo.png') # Ganti dengan nama file gambar logo Anda
-    #     st.image(image, use_column_width=True)
-    # except FileNotFoundError:
-    #     st.caption("Tambahkan 'car_logo.png' di direktori yang sama untuk gambar logo.")
+    try:
+         image = Image.open('PASD.png') # Ganti dengan nama file gambar logo Anda
+         st.image(image, use_column_width=True)
+    except FileNotFoundError:
+         st.caption("Tambahkan 'PASD.png' di direktori yang sama untuk gambar logo.")
     
     st.subheader("📊 Performa Model")
     st.info(f"""
