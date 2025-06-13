@@ -1,4 +1,3 @@
-#python
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -299,4 +298,3 @@ with col_metrics:
         
         Nilai R² yang tinggi (mendekati 1) menunjukkan bahwa model dapat menjelaskan sebagian besar variasi harga mobil.
     """)
-```
