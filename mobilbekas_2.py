@@ -15,6 +15,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from catboost import CatBoostRegressor
+import re
 from PIL import Image
 
 # --- Load Model ---
