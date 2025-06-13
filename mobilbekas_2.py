@@ -7,8 +7,8 @@ Original file is located at
     https://colab.research.google.com/drive/1oTJa3uvGuWdgeOvlP-u_IQ4uTozBLftp
 """
 
-!pip install streamlit
-!pip install catboost
+#!pip install streamlit
+#!pip install catboost
 
 import streamlit as st
 import pandas as pd
