@@ -207,7 +207,7 @@ features_df = pd.DataFrame([{
     'company_model': company_model_feature,
     'tipe_bahan_bakar': fuel_type_input,
     'log_km': log_km_feature,
-    'age': negative_age_feature, # Menggunakan negative_age_feature jika model dilatih dengan ini
+    'negative_age': negative_age_feature, # <--- GANTI 'age' menjadi 'negative_age' DI SINI
     'segment': segment_feature,
     'fuel_age': fuel_age_feature,
     'company_segment': company_segment_feature,
