@@ -147,11 +147,11 @@ st.title("🚗 Prediksi Harga Mobil Bekas")
 st.markdown("Gunakan aplikasi ini untuk memprediksi harga mobil bekas berdasarkan data kendaraan Anda.")
 
 
-# --- Bagian Performa Model Dipindahkan ke Sisi Kiri (Atas) ---
-st.markdown("---") # Garis pemisah
-col_main_content, col_metrics_display = st.columns([2, 1]) # Konten utama lebih lebar dari metrik
+# --- Struktur Kolom Utama untuk Konten dan Metrik ---
+# Kolom Kiri untuk Metrik (lebar 1 unit), Kolom Kanan untuk Konten Input (lebar 2 unit)
+col_metrics_display, col_main_content = st.columns([1, 2]) # <--- SINI YANG DIUBAH!
 
-with col_metrics_display: # Metrik di kolom kanan yang lebih kecil (kiri dari perspektif keseluruhan halaman)
+with col_metrics_display: # Metrik akan di kolom KIRI
     st.subheader("📊 Performa Model")
     st.info(f"""
         **Akurasi Model Berdasarkan Data Uji:**
@@ -162,7 +162,7 @@ with col_metrics_display: # Metrik di kolom kanan yang lebih kecil (kiri dari pe
         Nilai R² yang tinggi (mendekati 1) menunjukkan bahwa model dapat menjelaskan sebagian besar variasi harga mobil.
     """)
 
-with col_main_content: # Konten input utama akan berada di kolom kiri yang lebih besar
+with col_main_content: # Konten input utama akan berada di kolom KANAN
     st.subheader("Input Detail Mobil")
 
     # --- Input Pengguna dengan Filter Berurutan dan Layout Kolom ---
@@ -199,7 +199,7 @@ with col_main_content: # Konten input utama akan berada di kolom kiri yang lebih
     # Baris 3: Warna dan Varian
     col5, col6 = st.columns(2)
     with col5:
-        # common_colors = sorted(df_filter_data['warna'].astype(str).unique().tolist()) # Ini sebelumnya mengambil semua warna
+        # Filter warna berdasarkan merek dan model
         filtered_by_model_for_color = filtered_by_merek[filtered_by_merek['model'] == name_input]
         unique_colors = sorted(filtered_by_model_for_color['warna'].astype(str).unique().tolist())
         if not unique_colors:
@@ -207,7 +207,7 @@ with col_main_content: # Konten input utama akan berada di kolom kiri yang lebih
         color_input = st.selectbox("Warna Mobil", unique_colors, key="color_select")
 
     with col6:
-        # common_variants = sorted(df_filter_data['varian'].astype(str).unique().tolist()) # Ini sebelumnya mengambil semua varian
+        # Filter varian berdasarkan merek dan model (INI SUDAH DIKOREKSI)
         filtered_by_model_for_variant = filtered_by_merek[filtered_by_merek['model'] == name_input]
         unique_variants = sorted(filtered_by_model_for_variant['varian'].astype(str).unique().tolist())
         if not unique_variants:
