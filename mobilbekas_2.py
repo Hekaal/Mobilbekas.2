@@ -149,10 +149,10 @@ df_filter_data = load_filter_data()
 
 # Tambahkan gambar (opsional)
 try:
-     image = Image.open('logo-dari-canva.jpg') # Ganti dengan nama file gambar Anda
+     image = Image.open('prediksi-harga-mobil.png') # Ganti dengan nama file gambar Anda
      st.image(image, use_container_width=True)
 except FileNotFoundError:
-     st.caption("Tambahkan 'car_banner.png' di direktori yang sama untuk gambar header.")
+     st.caption("Tambahkan 'prediksi-harga-mobil.png' di direktori yang sama untuk gambar header.")
 
 
 # --- Konten Sidebar ---
