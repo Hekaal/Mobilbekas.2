@@ -151,7 +151,7 @@ df_filter_data = load_filter_data()
 try:
      image = Image.open('logo-dari-canva.jpg') # Ganti dengan nama file gambar Anda
      st.image(image, use_container_width=True)
- except FileNotFoundError:
+    except FileNotFoundError:
      st.caption("Tambahkan 'car_banner.png' di direktori yang sama untuk gambar header.")
 
 
