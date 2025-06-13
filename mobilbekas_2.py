@@ -148,11 +148,11 @@ def load_filter_data(file_path="mobilbekas.csv"):
 df_filter_data = load_filter_data()
 
 # Tambahkan gambar (opsional)
-# try:
-#     image = Image.open('car_banner.png') # Ganti dengan nama file gambar Anda
-#     st.image(image, use_column_width=True)
-# except FileNotFoundError:
-#     st.caption("Tambahkan 'car_banner.png' di direktori yang sama untuk gambar header.")
+try:
+     image = Image.open('logo-dari-canva.jpg') # Ganti dengan nama file gambar Anda
+     st.image(image, use_container_width=True)
+ except FileNotFoundError:
+     st.caption("Tambahkan 'car_banner.png' di direktori yang sama untuk gambar header.")
 
 
 # --- Konten Sidebar ---
