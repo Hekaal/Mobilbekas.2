@@ -147,14 +147,6 @@ def load_filter_data(file_path="mobilbekas.csv"):
 
 df_filter_data = load_filter_data()
 
-# Tambahkan gambar (opsional)
-try:
-     image = Image.open('prediksi-harga-mobil.jpg') # Ganti dengan nama file gambar Anda
-     st.image(image, use_container_width=True)
-except FileNotFoundError:
-     st.caption("Tambahkan 'prediksi-harga-mobil.jpg' di direktori yang sama untuk gambar header.")
-
-# --- Tambahkan Gambar di Konten Utama ---
 # Ganti blok try-except ini dengan yang baru untuk SVG
 # --- Tambahkan Gambar di Konten Utama ---
 try:
