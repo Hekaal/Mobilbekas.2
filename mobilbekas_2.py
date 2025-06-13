@@ -182,12 +182,12 @@ try:
              svg_content_modified = svg_content_modified.replace('<svg', '<svg width="100%" height="auto"', 1)
         
         # Opsi lain jika SVG sudah memiliki viewBox dan Anda hanya ingin fluiditas
-        # svg_content_modified = re.sub(
-        #     r'<svg([^>]*?)',
-        #     r'<svg\1 style="width:100%; height:auto;"',
-        #     svg_content,
-        #     flags=re.IGNORECASE
-        # )
+        svg_content_modified = re.sub(
+            r'<svg([^>]*?)',
+            r'<svg\1 style="width:100%; height:auto;"',
+            svg_content,
+            flags=re.IGNORECASE
+        )
 
     else:
         # Jika bukan SVG valid, tampilkan pesan error
@@ -196,8 +196,7 @@ try:
 
 
     st.markdown(svg_content_modified, unsafe_allow_html=True)
-    st.caption("Ilustrasi Prediksi Harga Mobil Bekas") # Caption untuk gambar SVG
-
+    
 except FileNotFoundError:
     st.caption(f"File SVG '{svg_file_name}' tidak ditemukan. Pastikan ada di direktori yang sama di repositori Anda.")
 except Exception as e:
