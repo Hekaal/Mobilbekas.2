@@ -184,7 +184,7 @@ st.markdown("Gunakan aplikasi ini untuk memprediksi harga mobil bekas berdasarka
 # --- Tambahkan Gambar di Konten Utama ---
 try:
     # Pastikan file gambar ini ada di repositori GitHub Anda
-    image = Image.open('illustrator-vector-design.avif')
+    image = Image.open('illustrator-vector-design.jpg')
     st.image(image, caption='Prediksi Harga Mobil Bekas', use_column_width=True)
 except FileNotFoundError:
     st.caption("Gambar 'illustrator-vector-design.avif' tidak ditemukan. Mohon unggah ke repositori Anda.")
