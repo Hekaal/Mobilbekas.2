@@ -163,14 +163,11 @@ try:
         svg_content = f.read()
 
     st.markdown(svg_content, unsafe_allow_html=True)
-    st.caption("Ilustrasi Prediksi Harga Mobil Bekas") # Caption untuk gambar SVG
 
 except FileNotFoundError:
     st.caption("File SVG tidak ditemukan. Pastikan 'Prediksi_Harga_Mobil.svg' ada di direktori yang sama di repositori Anda.")
 except Exception as e:
     st.caption(f"Tidak dapat menampilkan gambar SVG: {e}")
-
-st.header("Input Detail Mobil")
 
 # --- Konten Sidebar ---
 with st.sidebar:
