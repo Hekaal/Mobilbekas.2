@@ -220,15 +220,6 @@ with st.sidebar:
 st.title("🚗 Prediksi Harga Mobil Bekas")
 st.markdown("Gunakan aplikasi ini untuk memprediksi harga mobil bekas berdasarkan data kendaraan Anda.")
 
-# --- Tambahkan Gambar di Konten Utama ---
-try:
-    # Pastikan file gambar ini ada di repositori GitHub Anda
-    image = Image.open('illustrator-vector-design.jpg')
-    st.image(image, caption='Prediksi Harga Mobil Bekas', use_container_width=True)
-except FileNotFoundError:
-    st.caption("Gambar 'illustrator-vector-design.avif' tidak ditemukan. Mohon unggah ke repositori Anda.")
-except Exception as e:
-    st.caption(f"Tidak dapat menampilkan gambar: {e}")
 
 st.subheader("Input Detail Mobil")
 
