@@ -1,7 +1,7 @@
 # Ini adalah bagian yang HARUS di bagian paling atas file Anda
 # Tidak boleh ada kode Streamlit lain (seperti st.error, st.write, dll.)
 # atau bahkan impor, di atas blok ini.
-import streamlit as st # Streamlit diimpor di sini juga untuk digunakan di bawah
+import streamlit as st
 import pandas as pd
 import numpy as np
 import pickle
@@ -89,7 +89,6 @@ st.markdown("""
 
 
 # --- Load Model ---
-# Menggunakan st.cache_resource agar model hanya dimuat sekali
 @st.cache_resource
 def load_model():
     try:
@@ -135,8 +134,16 @@ def load_filter_data(file_path="mobilbekas.csv"):
             else:
                 df[col] = 'Unknown'
 
-        df.dropna(subset=['merek', 'model', 'tipe_bahan_bakar', 'transmisi'], inplace=True)
-        return df
+        # Buat kolom company_model untuk grouping harga
+        df['company_model'] = df['merek'].astype(str) + '_' + df['model'].astype(str)
+
+        df.dropna(subset=['merek', 'model', 'tipe_bahan_bakar', 'transmisi', 'harga', 'company_model'], inplace=True)
+        
+        # Hitung harga rata-rata per model untuk estimasi harga dasar
+        # Ini akan digunakan untuk segmentasi harga dinamis
+        model_avg_price_map = df.groupby('company_model')['harga'].mean().to_dict()
+
+        return df, model_avg_price_map # Mengembalikan DataFrame dan map harga rata-rata
 
     except FileNotFoundError:
         st.error(f"Error: '{file_path}' not found. File ini dibutuhkan untuk filtering dinamis. Pastikan ada di direktori yang sama.")
@@ -145,9 +152,35 @@ def load_filter_data(file_path="mobilbekas.csv"):
         st.error(f"Terjadi kesalahan saat memuat atau memproses dataset untuk filtering: {e}")
         st.stop()
 
-df_filter_data = load_filter_data()
+# df_filter_data sekarang juga akan mengembalikan model_avg_price_map
+df_filter_data, model_avg_price_map = load_filter_data()
 
-# Ganti blok try-except ini dengan yang baru untuk SVG
+# --- Konten Sidebar ---
+with st.sidebar:
+    # Tambahkan gambar (opsional) di sidebar
+    try:
+        image = Image.open('PASD.png') # Ganti dengan nama file gambar logo Anda
+        st.image(image, use_container_width=True)
+    except FileNotFoundError:
+        st.caption("Tambahkan 'PASD.png' di direktori yang sama untuk gambar logo.")
+    
+    st.subheader("📊 Performa Model")
+    st.info(f"""
+        **Akurasi Model Berdasarkan Data Uji:**
+        * **MAE (Mean Absolute Error):** Rp 21.284.885
+        * **RMSE (Root Mean Squared Error):** Rp 41.992.638
+        * **R² (R-squared):** 0.963
+        
+        Nilai R² yang tinggi (mendekati 1) menunjukkan bahwa model dapat menjelaskan sebagian besar variasi harga mobil.
+    """)
+    st.markdown("---")
+    st.caption("Aplikasi Prediksi Harga Mobil Bekas")
+
+
+# --- Bagian Judul Utama dan Deskripsi (di Main Content) ---
+st.title("🚗 Prediksi Harga Mobil Bekas")
+st.markdown("Gunakan aplikasi ini untuk memprediksi harga mobil bekas berdasarkan data kendaraan Anda.")
+
 # --- Tambahkan Gambar di Konten Utama ---
 try:
     # Nama file SVG Anda
@@ -161,8 +194,6 @@ try:
     # Ini adalah pendekatan yang lebih umum dan aman
     if '<svg' in svg_content:
         # Menambahkan atau mengganti atribut width dan height
-        # Regex ini mencari tag <svg> dan menambahkan/mengganti width/height
-        # Ini mungkin perlu disesuaikan tergantung kompleksitas SVG Anda
         svg_content_modified = re.sub(
             r'<svg([^>]*?)width="[^"]*"([^>]*?)height="[^"]*"([^>]*?)',
             r'<svg\1width="100%"\2height="auto"\3',
@@ -174,18 +205,16 @@ try:
              svg_content_modified = svg_content_modified.replace('<svg', '<svg width="100%" height="auto"', 1)
         
         # Opsi lain jika SVG sudah memiliki viewBox dan Anda hanya ingin fluiditas
-        svg_content_modified = re.sub(
-            r'<svg([^>]*?)',
-            r'<svg\1 style="width:100%; height:auto;"',
-            svg_content,
-            flags=re.IGNORECASE
-        )
-
+        # svg_content_modified = re.sub(
+        #     r'<svg([^>]*?)',
+        #     r'<svg\1 style="width:100%; height:auto;"',
+        #     svg_content,
+        #     flags=re.IGNORECASE
+        # )
     else:
         # Jika bukan SVG valid, tampilkan pesan error
         st.error(f"File '{svg_file_name}' sepertinya bukan file SVG yang valid.")
         st.stop()
-
 
     st.markdown(svg_content_modified, unsafe_allow_html=True)
     
@@ -194,38 +223,9 @@ except FileNotFoundError:
 except Exception as e:
     st.caption(f"Tidak dapat menampilkan gambar SVG: {e}")
     
-# --- Konten Sidebar ---
-with st.sidebar:
-    # Tambahkan gambar (opsional) di sidebar
-    try:
-         image = Image.open('PASD.png') # Ganti dengan nama file gambar logo Anda
-         st.image(image, use_container_width=True)
-    except FileNotFoundError:
-         st.caption("Tambahkan 'PASD.png' di direktori yang sama untuk gambar logo.")
-    
-    st.subheader("📊 Performa Model")
-    st.info(f"""
-        **Akurasi Model Berdasarkan Data Uji:**
-        * **MAE (Mean Absolute Error):** Rp 22.263.400
-        * **RMSE (Root Mean Squared Error):** Rp 44.287.777
-        * **R² (R-squared):** 0.964
-        
-    """)
-    st.markdown("---")
-    st.caption("Aplikasi Prediksi Harga Mobil Bekas")
-
-
-# --- Bagian Judul Utama dan Deskripsi (di Main Content) ---
-st.title("Prediksi Harga Mobil Bekas")
-st.markdown("Gunakan aplikasi ini untuk memprediksi harga mobil bekas berdasarkan data kendaraan Anda.")
-
-
 st.subheader("Input Detail Mobil")
 
 # --- Input Pengguna dengan Filter Berurutan dan Layout Kolom ---
-# Tidak perlu lagi st.columns di sini karena sudah ada sidebar
-# Semua input akan berada di kolom utama secara vertikal
-
 # Baris 1: Merek dan Model
 col1, col2 = st.columns(2)
 with col1:
@@ -288,49 +288,65 @@ with col8:
 # company_model
 company_model_feature = f"{company_input}_{name_input}"
 
-# segment (based on estimated price, as actual price is unknown for prediction)
-base_prices = {
-    'Audi A6': 650_000_000, 'BMW 5 Series': 700_000_000, 'Mercedes C-Class': 750_000_000,
-    'Toyota Fortuner': 350_000_000, 'Honda City': 300_000_000, 'Hyundai i20': 250_000_000,
-    'Maruti Swift': 120_000_000, 'Tata Nano': 110_000_000, 'Daihatsu Ayla': 130_000_000,
-    'Wuling Confero': 150_000_000, 'Hyundai Creta': 320_000_000, 'Suzuki Karimun': 90_000_000,
-    'DFSK Glory': 200_000_000, 'Volkswagen Polo': 280_000_000, 'Mazda CX-5': 450_000_000
-}
-estimated_price = base_prices.get(name_input, 200_000_000) # Default if car not in list
+# segment (based on estimated price, which is now from actual data avg)
+# Menggunakan harga rata-rata dari data yang dimuat
+# Pastikan company_model_feature ada di model_avg_price_map
+estimated_price = model_avg_price_map.get(company_model_feature, 200_000_000) # Default jika tidak ditemukan
+
 segment_bins = [0, 80e6, 150e6, 300e6, 500e6, 1e9, 3e9]
 segment_labels = ['ultra_low', 'low', 'mid_low', 'mid_high', 'high', 'lux']
-segment_feature = pd.cut([estimated_price], bins=segment_bins, labels=segment_labels, right=False)[0]
+segment_feature_raw = pd.cut([estimated_price], bins=segment_bins, labels=segment_labels, right=False)[0]
+# Pastikan segment_feature_raw diubah menjadi string dan menangani NaN
+segment_feature = str(segment_feature_raw) if pd.notna(segment_feature_raw) else 'Unknown_Segment' # Default jika NaN
 
 
 # fuel_age
-fuel_age_feature = f"{fuel_type_input}_{age_input}"
+fuel_age_feature_raw = f"{fuel_type_input}_{age_input}"
+fuel_age_feature = str(fuel_age_feature_raw) if pd.notna(fuel_age_feature_raw) else 'Unknown_FuelAge' # Default jika NaN
+
 
 # company_segment
-company_segment_feature = f"{company_model_feature}_{segment_feature}"
+company_segment_feature_raw = f"{company_model_feature}_{segment_feature}"
+company_segment_feature = str(company_segment_feature_raw) if pd.notna(company_segment_feature_raw) else 'Unknown_CompanySegment' # Default jika NaN
+
 
 # log_km
-log_km_feature = np.log1p(kms_driven_input)
+log_km_feature = np.log1p(kms_driven_input) # log_km ini numerik, tidak perlu string conversion kecuali NaN
 
 # log_km_per_year
 log_km_per_year_feature = np.log1p(kms_driven_input / max(age_input, 1))
 
-# brand_category (based on model name)
-lux_names = ['BMW 5 Series', 'Mercedes C-Class', 'Audi A6', 'Land Rover Evoque']
-mid_names = ['Toyota Fortuner', 'Honda City', 'Hyundai Creta', 'Volkswagen Polo', 'Mazda CX-5']
-budget_names = ['Daihatsu Ayla', 'Suzuki Karimun', 'Wuling Confero', 'Tata Nano', 'Chery QQ', 'DFSK Glory']
 
-if name_input in lux_names:
-    brand_category_feature = 'luxury'
-elif name_input in mid_names:
-    brand_category_feature = 'midrange'
-elif name_input in budget_names:
-    brand_category_feature = 'budget'
-else:
-    brand_category_feature = 'general'
+# brand_category (based on model name) - DIPERBARUI UNTUK MOBIL MEWAH
+# Daftar model ini harus disinkronkan dengan skrip pelatihan model Anda
+ultra_lux_names = ['Ferrari', 'Lamborghini', 'Rolls-Royce', 'Bentley', 'McLaren', 'Bugatti',
+                   'Porsche 911', 'Aston Martin']
+lux_names = ['BMW 5 Series', 'Mercedes C-Class', 'Audi A6', 'Land Rover Evoque',
+             'BMW 7 Series', 'Mercedes S-Class', 'Audi A8', 'Lexus LS']
+mid_names = ['Toyota Fortuner', 'Honda City', 'Hyundai Creta', 'Volkswagen Polo', 'Mazda CX-5',
+             'Toyota Innova', 'Honda CR-V', 'Hyundai Santa Fe']
+budget_names = ['Daihatsu Ayla', 'Suzuki Karimun', 'Wuling Confero', 'Tata Nano', 'Chery QQ', 'DFSK Glory',
+                'Toyota Agya', 'Honda Brio']
+
+def get_category(model_name):
+    if model_name in ultra_lux_names:
+        return 'ultra_luxury'
+    elif model_name in lux_names:
+        return 'luxury'
+    elif model_name in mid_names:
+        return 'midrange'
+    elif model_name in budget_names:
+        return 'budget'
+    else:
+        return 'general'
+
+brand_category_feature_raw = get_category(name_input) # Menggunakan name_input (Model)
+brand_category_feature = str(brand_category_feature_raw) if pd.notna(brand_category_feature_raw) else 'Unknown_BrandCategory' # Default jika NaN
+
 
 # Flags tambahan
 is_premium_feature = int(brand_category_feature == 'luxury' and age_input <= 3)
-is_high_value_feature = int(brand_category_feature in ['luxury', 'midrange'] and age_input <= 5 and kms_driven_input <= 60000)
+is_high_value_feature = int(brand_category_feature in ['ultra_luxury', 'luxury', 'midrange'] and age_input <= 5 and kms_driven_input <= 60000)
 is_low_budget_feature = int(brand_category_feature == 'budget' and age_input >= 10 and kms_driven_input >= 120000)
 
 # Negative age feature (for monotonicity if implemented in training)
